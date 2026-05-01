@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Study Mode - RAG Learning Platform</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #0ea5e9;
+            --primary-dark: #0284c7;
+            --secondary: #8b5cf6;
+            --success: #10b981;
+            --danger: #ef4444;
+            --bg-dark: #0f172a;
+            --bg-darker: #020617;
+            --bg-card: #1e293b;
+            --bg-card-light: #334155;
+            --text: #f1f5f9;
+            --text-muted: #cbd5e1;
+            --border: #475569;
+        }
+
+        html, body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(circle at 20% 50%, rgba(14, 165, 233, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 80%, rgba(139, 92, 246, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(71, 85, 105, 0.3);
+        }
+
+        .header h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 28px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), #38bdf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .btn-back {
+            padding: 10px 20px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text);
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-back:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .card h2 {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card i {
+            color: var(--primary);
+        }
+
+        .document-list {
+            display: grid;
+            gap: 15px;
+        }
+
+        .doc-item {
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .doc-item:hover {
+            border-color: var(--primary);
+            box-shadow: 0 8px 24px rgba(14, 165, 233, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .doc-title {
+            font-weight: 700;
+            font-size: 16px;
+            margin-bottom: 8px;
+            color: var(--primary);
+        }
+
+        .doc-content {
+            font-size: 14px;
+            line-height: 1.6;
+            color: var(--text);
+            margin-bottom: 12px;
+        }
+
+        .doc-source {
+            font-size: 12px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-muted);
+        }
+
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-graduation-cap"></i> Study Mode</h1>
+            <a href="/" class="btn-back">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+
+        <div class="card">
+            <h2>
+                <i class="fas fa-book-open"></i> Learning Materials
+            </h2>
+            <p style="color: var(--text-muted); margin-bottom: 20px;">
+                Review all your learning documents in depth. Use these materials to study specific topics and improve your understanding.
+            </p>
+
+            <div class="document-list">
+                {% if documents %}
+                    {% for doc in documents %}
+                    <div class="doc-item">
+                        <div class="doc-title">
+                            <i class="fas fa-file-alt"></i> {{ doc.id }}
+                        </div>
+                        <div class="doc-content">
+                            {{ doc.document }}
+                        </div>
+                        <div class="doc-source">
+                            <i class="fas fa-tag"></i> {{ doc.source }}
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                <div class="empty-state">
+                    <div class="empty-icon">
+                        <i class="fas fa-inbox"></i>
+                    </div>
+                    <p>No documents available for study. Add documents from the main dashboard to begin studying.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>
+                <i class="fas fa-chart-bar"></i> Study Tips
+            </h2>
+            <ul style="list-style: none; padding: 0;">
+                <li style="padding: 12px 0; border-bottom: 1px solid var(--border); display: flex; gap: 12px;">
+                    <span style="color: var(--primary);">✓</span>
+                    <span>Read through each document carefully to understand the concepts</span>
+                </li>
+                <li style="padding: 12px 0; border-bottom: 1px solid var(--border); display: flex; gap: 12px;">
+                    <span style="color: var(--primary);">✓</span>
+                    <span>Use the main dashboard to ask questions about the materials</span>
+                </li>
+                <li style="padding: 12px 0; border-bottom: 1px solid var(--border); display: flex; gap: 12px;">
+                    <span style="color: var(--primary);">✓</span>
+                    <span>Save important Q&A pairs to your favorites for quick reference</span>
+                </li>
+                <li style="padding: 12px 0; display: flex; gap: 12px;">
+                    <span style="color: var(--primary);">✓</span>
+                    <span>Review your chat history to track what you've learned</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // You can add study mode interactivity here
+        console.log('Study mode loaded');
+    </script>
+</body>
+</html>
